@@ -154,7 +154,7 @@ public class SpeechToTextAPI {
         protected void onHandleIntent(final Intent intent) {
             Logger.logDebug(LOG_TAG, "onHandleIntent:\n" + IntentUtils.getIntentString(intent));
 
-	    final String speechLanguage = intent.getStringExtra("language")
+	    final String speechLanguage = intent.getStringExtra("language");
 
             Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Enter shell command");
