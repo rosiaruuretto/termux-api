@@ -140,14 +140,6 @@ public class SpeechToTextAPI {
                         }).setNegativeButton("Cancel", null) // cancel button
                         .create().show();
             }
-
-            Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Enter shell command");
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-            mSpeechRecognizer.startListening(recognizerIntent);
         }
 
         @Override
@@ -161,6 +153,20 @@ public class SpeechToTextAPI {
         @Override
         protected void onHandleIntent(final Intent intent) {
             Logger.logDebug(LOG_TAG, "onHandleIntent:\n" + IntentUtils.getIntentString(intent));
+
+	    final String speechLanguage = intent.getStringExtra("language")
+
+            Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Enter shell command");
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10);
+	    if (speechLanguage != null) {
+	         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, speechLanguage);
+	    } else {
+		 recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+	    }
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+            mSpeechRecognizer.startListening(recognizerIntent);
 
             ResultReturner.returnData(this, intent, new ResultReturner.WithInput() {
                 @Override
