@@ -47,6 +47,22 @@ public class SpeechToTextAPI {
             Logger.logDebug(LOG_TAG, "onCreate");
 
             super.onCreate();
+        }
+
+        @Override
+        public void onDestroy() {
+            Logger.logDebug(LOG_TAG, "onDestroy");
+
+            super.onDestroy();
+            mSpeechRecognizer.destroy();
+        }
+
+        @Override
+        protected void onHandleIntent(final Intent intent) {
+            Logger.logDebug(LOG_TAG, "onHandleIntent:\n" + IntentUtils.getIntentString(intent));
+
+	    final String speechLanguage = intent.getStringExtra("language");
+
             final Context context = this;
 
             mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
@@ -140,21 +156,6 @@ public class SpeechToTextAPI {
                         }).setNegativeButton("Cancel", null) // cancel button
                         .create().show();
             }
-        }
-
-        @Override
-        public void onDestroy() {
-            Logger.logDebug(LOG_TAG, "onDestroy");
-
-            super.onDestroy();
-            mSpeechRecognizer.destroy();
-        }
-
-        @Override
-        protected void onHandleIntent(final Intent intent) {
-            Logger.logDebug(LOG_TAG, "onHandleIntent:\n" + IntentUtils.getIntentString(intent));
-
-	    final String speechLanguage = intent.getStringExtra("language");
 
             Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Enter shell command");
