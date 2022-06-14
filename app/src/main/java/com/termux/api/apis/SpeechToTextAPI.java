@@ -20,6 +20,7 @@ import com.termux.shared.logger.Logger;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class SpeechToTextAPI {
@@ -40,7 +41,7 @@ public class SpeechToTextAPI {
 
         protected SpeechRecognizer mSpeechRecognizer;
 	final CountDownLatch latch = new CountDownLatch(1);
-	private Intent recognizerIntent;
+	final Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         final LinkedBlockingQueue<String> queueu = new LinkedBlockingQueue<>();
 
         private static final String LOG_TAG = "SpeechToTextService";
@@ -145,7 +146,7 @@ public class SpeechToTextAPI {
                         .create().show();
             }
 
-	    latch.await();
+	    latch.await(1, TimeUnit.SECONDS);
             mSpeechRecognizer.startListening(recognizerIntent);
 
         }
@@ -164,7 +165,6 @@ public class SpeechToTextAPI {
 
 	    final String speechLanguage = intent.getStringExtra("language");
 
-            Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Enter shell command");
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10);
