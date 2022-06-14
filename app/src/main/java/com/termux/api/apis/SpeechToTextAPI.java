@@ -146,7 +146,10 @@ public class SpeechToTextAPI {
                         .create().show();
             }
 
-	    latch.await(1, TimeUnit.SECONDS);
+	    try {
+		latch.await(1, TimeUnit.SECONDS);
+	    } catch (InterruptedException e) {
+	    }
             mSpeechRecognizer.startListening(recognizerIntent);
 
         }
