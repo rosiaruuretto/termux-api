@@ -67,6 +67,10 @@ public class SpeechToTextAPI {
                     List<String> recognitions = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                     Logger.logError(LOG_TAG, "RecognitionListener#onResults(" + recognitions + ")");
                     queueu.addAll(recognitions);
+		    // On full mode, stop only when recognition is achieved
+		    if (!recognizerIntent.getBooleanExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)) {
+			    queueu.add(STOP_ELEMENT);
+		    }
                 }
 
                 @Override
@@ -113,7 +117,11 @@ public class SpeechToTextAPI {
                 @Override
                 public void onEndOfSpeech() {
                     Logger.logError(LOG_TAG, "RecognitionListener#onEndOfSpeech()");
-                    queueu.add(STOP_ELEMENT);
+
+		    // On partial mode, stop recognition when speech ends
+		    if (recognizerIntent.getBooleanExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)) {
+			    queueu.add(STOP_ELEMENT);
+		    }
                 }
 
                 @Override
