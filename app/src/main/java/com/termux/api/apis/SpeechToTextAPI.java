@@ -19,6 +19,7 @@ import com.termux.shared.logger.Logger;
 
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class SpeechToTextAPI {
@@ -38,6 +39,8 @@ public class SpeechToTextAPI {
         }
 
         protected SpeechRecognizer mSpeechRecognizer;
+	final CountDownLatch latch = new CountDownLatch(1);
+	private Intent recognizerIntent;
         final LinkedBlockingQueue<String> queueu = new LinkedBlockingQueue<>();
 
         private static final String LOG_TAG = "SpeechToTextService";
@@ -47,21 +50,6 @@ public class SpeechToTextAPI {
             Logger.logDebug(LOG_TAG, "onCreate");
 
             super.onCreate();
-        }
-
-        @Override
-        public void onDestroy() {
-            Logger.logDebug(LOG_TAG, "onDestroy");
-
-            super.onDestroy();
-            mSpeechRecognizer.destroy();
-        }
-
-        @Override
-        protected void onHandleIntent(final Intent intent) {
-            Logger.logDebug(LOG_TAG, "onHandleIntent:\n" + IntentUtils.getIntentString(intent));
-
-	    final String speechLanguage = intent.getStringExtra("language");
 
             final Context context = this;
 
@@ -157,6 +145,25 @@ public class SpeechToTextAPI {
                         .create().show();
             }
 
+	    latch.await();
+            mSpeechRecognizer.startListening(recognizerIntent);
+
+        }
+
+        @Override
+        public void onDestroy() {
+            Logger.logDebug(LOG_TAG, "onDestroy");
+
+            super.onDestroy();
+            mSpeechRecognizer.destroy();
+        }
+
+        @Override
+        protected void onHandleIntent(final Intent intent) {
+            Logger.logDebug(LOG_TAG, "onHandleIntent:\n" + IntentUtils.getIntentString(intent));
+
+	    final String speechLanguage = intent.getStringExtra("language");
+
             Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Enter shell command");
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -167,13 +174,16 @@ public class SpeechToTextAPI {
 		 recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
 	    }
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-            mSpeechRecognizer.startListening(recognizerIntent);
+
+	    latch.countDown();
 
             ResultReturner.returnData(this, intent, new ResultReturner.WithInput() {
                 @Override
                 public void writeResult(PrintWriter out) throws Exception {
+                    Logger.logError(LOG_TAG, "Start listening");
                     while (true) {
                         String s = queueu.take();
+			Logger.logError(LOG_TAG, "Queueu taken");
                         if (s == STOP_ELEMENT) {
                             return;
                         } else {
