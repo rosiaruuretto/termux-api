@@ -66,6 +66,7 @@ public class TextToSpeechAPI {
             final String speechLanguage = intent.getStringExtra("language");
             final String speechRegion = intent.getStringExtra("region");
             final String speechVariant = intent.getStringExtra("variant");
+            final String speechVoice = intent.getStringExtra("voice");
             final String speechEngine = intent.getStringExtra("engine");
             final float speechPitch = intent.getFloatExtra("pitch", 1.0f);
 
@@ -171,6 +172,25 @@ public class TextToSpeechAPI {
                                 Logger.logError(LOG_TAG, "tts.setLanguage('" + speechLanguage + "') returned " + setLanguageResult);
                             }
                         }
+                        
+                        if (speechVoice != null) {
+                            Set<Voice> voices = mTts.getVoices();
+                            Iterator<Voice> itr = voices.iterator();
+                            
+                            bool voiceFound = false;
+                            while (itr.hasNext()) {
+                                Voice v = itr.next();
+                                if (v.getName() == speechVoice) {
+                                    voiceFound = true;
+                                    mTts.setVoice(v);
+                                    break;
+                                }
+                            }
+                            
+                            if (!voiceFound) {
+                                Logger.logError(LOG_TAG, "Voice not found: " + speechVoice);
+                            }
+                        }      
 
                         mTts.setPitch(speechPitch);
                         mTts.setSpeechRate(intent.getFloatExtra("rate", 1.0f));
