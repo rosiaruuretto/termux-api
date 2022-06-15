@@ -184,7 +184,7 @@ public class TextToSpeechAPI {
                             String lastVoiceName = "NO_VOICES";
                             while (itr.hasNext()) {
                                 Voice v = itr.next();
-                                lastVoiceName = v.getName()
+                                lastVoiceName = v.getName();
                                 if (lastVoiceName.equals(speechVoice)) {
                                     voiceFound = true;
                                     mTts.setVoice(v);
