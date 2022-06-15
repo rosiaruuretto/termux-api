@@ -9,6 +9,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.Engine;
 import android.speech.tts.TextToSpeech.EngineInfo;
 import android.speech.tts.UtteranceProgressListener;
+import android.speech.tts.Voice;
 import android.util.JsonWriter;
 
 import com.termux.api.util.ResultReturner;
@@ -19,6 +20,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Locale;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -177,7 +180,7 @@ public class TextToSpeechAPI {
                             Set<Voice> voices = mTts.getVoices();
                             Iterator<Voice> itr = voices.iterator();
                             
-                            bool voiceFound = false;
+                            Boolean voiceFound = false;
                             while (itr.hasNext()) {
                                 Voice v = itr.next();
                                 if (v.getName() == speechVoice) {
