@@ -181,9 +181,11 @@ public class TextToSpeechAPI {
                             Iterator<Voice> itr = voices.iterator();
                             
                             Boolean voiceFound = false;
+                            String lastVoiceName = "NO_VOICES";
                             while (itr.hasNext()) {
                                 Voice v = itr.next();
-                                if (v.getName() == speechVoice) {
+                                lastVoiceName = v.getName()
+                                if (lastVoiceName.equals(speechVoice)) {
                                     voiceFound = true;
                                     mTts.setVoice(v);
                                     break;
@@ -191,7 +193,7 @@ public class TextToSpeechAPI {
                             }
                             
                             if (!voiceFound) {
-                                Logger.logError(LOG_TAG, "Voice not found: " + speechVoice);
+                                Logger.logError(LOG_TAG, "Voice not found: " + speechVoice + " (voice name should be formatted as " + lastVoiceName + ")");
                             }
                         }      
 
